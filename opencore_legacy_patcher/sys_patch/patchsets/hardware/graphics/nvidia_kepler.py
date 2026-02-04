@@ -120,6 +120,26 @@ class NvidiaKepler(BaseHardware):
         }
 
 
+    def _sequoia_opengl_plist_patch(self) -> dict:
+        """
+        Create minimal OpenGL preference plist on Sequoia
+
+        Sequoia removed the OpenGL preference infrastructure, but legacy Kepler drivers
+        still query it, causing nsattributedstringagent crashes in Software Update and WebKit.
+        Creating a minimal com.apple.opengl.plist prevents these crashes.
+        """
+        if self._xnu_major < os_data.sequoia.value:
+            return {}
+
+        return {
+            "Nvidia Kepler - OpenGL Preference Workaround": {
+                PatchType.EXECUTE: {
+                    "/usr/bin/defaults write /Library/Preferences/com.apple.opengl Renderer -string legacy": True,
+                },
+            },
+        }
+
+
     def patches(self) -> dict:
         """
         Patches for Nvidia Kepler GPUs
@@ -133,4 +153,5 @@ class NvidiaKepler(BaseHardware):
             **BigSurOpenCL(self._xnu_major, self._xnu_minor, self._constants.detected_os_version).patches(),
             **MontereyWebKit(self._xnu_major, self._xnu_minor, self._os_build).patches(),
             **self._model_specific_patches(),
+            **self._sequoia_opengl_plist_patch(),
         }
