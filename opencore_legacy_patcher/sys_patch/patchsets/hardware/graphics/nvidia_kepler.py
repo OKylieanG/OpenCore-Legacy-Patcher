@@ -134,7 +134,11 @@ class NvidiaKepler(BaseHardware):
         return {
             "Nvidia Kepler - OpenGL Preference Workaround": {
                 PatchType.EXECUTE: {
-                    "/usr/bin/defaults write /Library/Preferences/com.apple.opengl Renderer -string legacy": True,
+                    "/usr/bin/defaults write /Library/Preferences/com.apple.opengl GLUseVertexArrayObjects -bool true": True,
+                    "/usr/bin/defaults write /Library/Preferences/com.apple.opengl GLUseSoftwareRasterizer -bool false": True,
+                    "/usr/bin/defaults write /Library/Preferences/com.apple.opengl GLRendererFloatAcceleration -int 1": True,
+                    "/usr/bin/defaults write /Library/Preferences/com.apple.opengl GLEnablePerformanceOptimizations -bool true": True,
+                    "/usr/bin/defaults write /Library/Preferences/com.apple.opengl GLUseAutoGPUSwitching -bool false": True,
                 },
             },
         }
